@@ -1,0 +1,58 @@
+<div>
+    <input
+      type="text"
+      placeholder="Search by title"
+      [(ngModel)]="searchTerm"
+      (input)="onSearch()"
+      class="search-input"
+    />
+  </div>
+  
+  <table mat-table [dataSource]="filteredPosts" class="mat-elevation-z8">
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef> ID </th>
+      <td mat-cell *matCellDef="let post"> {{ post.id }} </td>
+    </ng-container>
+  
+    <ng-container matColumnDef="title">
+      <th mat-header-cell *matHeaderCellDef> Title </th>
+      <td mat-cell *matCellDef="let post">
+        <div *ngIf="editMode && currentPost?.id === post.id">
+          <input [(ngModel)]="currentPost!.title" placeholder="Edit title" />
+        </div>
+        <div *ngIf="!(editMode && currentPost?.id === post.id)">
+          {{ post.title }}
+        </div>
+      </td>
+    </ng-container>
+  
+    <ng-container matColumnDef="body">
+      <th mat-header-cell *matHeaderCellDef> Body </th>
+      <td mat-cell *matCellDef="let post">
+        <div *ngIf="editMode && currentPost?.id === post.id">
+          <textarea [(ngModel)]="currentPost!.body" placeholder="Edit body"></textarea>
+        </div>
+        <div *ngIf="!(editMode && currentPost?.id === post.id)">
+          {{ post.body }}
+        </div>
+      </td>
+    </ng-container>
+  
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef> Actions </th>
+      <td mat-cell *matCellDef="let post">
+        <div *ngIf="editMode && currentPost?.id === post.id">
+          <button (click)="savePost()">Save</button>
+          <button (click)="cancelEdit()">Cancel</button>
+        </div>
+        <div *ngIf="!(editMode && currentPost?.id === post.id)">
+          <button (click)="editPost(post)">Edit</button>
+          <button (click)="deletePost(post)">Delete</button>
+        </div>
+      </td>
+    </ng-container>
+  
+    <tr mat-header-row *matHeaderRowDef="['id', 'title', 'body', 'actions']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['id', 'title', 'body', 'actions']"></tr>
+  </table>
+  
