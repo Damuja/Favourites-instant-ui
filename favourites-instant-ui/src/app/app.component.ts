@@ -7,7 +7,6 @@ import { DataGridComponent } from './data-grid/data-grid.component';
   standalone: true,
   imports: [DataGridComponent],
   template: `
-    <h1>Dummy Fav & Instant tickets</h1>
     <app-data-grid></app-data-grid>
   `,
   styleUrls: ['./app.component.css'],
