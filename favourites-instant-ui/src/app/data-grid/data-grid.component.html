@@ -1,12 +1,15 @@
 <div class="container">
-  <h1 class="page-title">Post Data Table</h1>
+  <h1>Favourite & Instant Fares portal</h1>
 
-  <!-- Search Box -->
+  <!-- Search Box centered -->
   <div class="search-box">
-    <mat-form-field appearance="fill">
-      <mat-label>Search by title</mat-label>
-      <input matInput type="text" placeholder="Search..." [(ngModel)]="searchTerm" (input)="onSearch()" class="search-input"/>
-    </mat-form-field>
+    <input
+      type="text"
+      placeholder="Search by title"
+      [(ngModel)]="searchTerm"
+      (input)="onSearch()"
+      class="search-input"
+    />
   </div>
 
   <!-- Posts Table -->
@@ -22,20 +25,22 @@
     <ng-container matColumnDef="title">
       <th mat-header-cell *matHeaderCellDef> Title </th>
       <td mat-cell *matCellDef="let post">
-        <span (click)="toggleExpand(post)" class="clickable-title">{{ post.title }}</span>
-        <div *ngIf="isExpanded(post)" class="expanded-content">
+        <span (click)="toggleExpand(post, $event)" style="cursor: pointer;">
+          {{ post.title }}
+        </span>
+        <div *ngIf="expandedPostIds.has(post.id)" class="expanded-content">
           <p><strong>ID:</strong> {{ post.id }}</p>
           <p><strong>Body:</strong> {{ post.body }}</p>
         </div>
       </td>
     </ng-container>
 
-    <!-- Expand Button Column -->
+    <!-- Edit and Delete Button Column -->
     <ng-container matColumnDef="expand">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let post">
-          <button mat-raised-button color="primary" (click)="editPost(post)">Edit</button>
-          <button mat-raised-button color="warn" (click)="deletePost(post)">Delete</button>
+        <button (click)="editPost(post)">Edit</button>
+        <button (click)="deletePost(post)">Delete</button>
       </td>
     </ng-container>
 
@@ -43,12 +48,12 @@
     <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand"></tr>
 
     <!-- Data Row -->
-    <tr mat-row *matRowDef="let post; columns: columnsToDisplayWithExpand;" (click)="toggleExpand(post)"></tr>
+    <tr mat-row *matRowDef="let post; columns: columnsToDisplayWithExpand;" (click)="toggleExpand(post, $event)"></tr>
   </table>
 
-  <!-- Edit Form (Modal/Popup) -->
-  <div *ngIf="editMode" class="edit-modal">
-    <div class="edit-form-card">
+  <!-- Edit Modal -->
+  <div *ngIf="editMode" class="edit-modal" (click)="stopRowExpand($event)">
+    <div class="edit-form-card" (click)="stopRowExpand($event)">
       <h2>Edit Post</h2>
       <mat-form-field appearance="fill">
         <mat-label>Title</mat-label>

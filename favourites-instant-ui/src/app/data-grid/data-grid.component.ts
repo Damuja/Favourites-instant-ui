@@ -50,7 +50,15 @@ export class DataGridComponent implements OnInit {
     }
   }
 
-  toggleExpand(post: Post): void {
+
+
+   // Modified toggleExpand to ignore clicks when modal is open
+   toggleExpand(post: Post, event: MouseEvent): void {
+    if (this.editMode) {
+      event.stopPropagation(); // Stop event propagation to prevent row expansion
+      return;
+    }
+
     if (this.expandedPostIds.has(post.id)) {
       this.expandedPostIds.delete(post.id); // Collapse the post
     } else {
@@ -58,10 +66,10 @@ export class DataGridComponent implements OnInit {
     }
   }
 
-  isExpanded(post: Post): boolean {
-    return this.expandedPostIds.has(post.id);
+  // Function to stop event propagation inside the modal
+  stopRowExpand(event: MouseEvent): void {
+    event.stopPropagation(); // Stop event propagation
   }
-
   editPost(post: Post): void {
     console.log('Editing post:', post);
     this.editMode = true;
@@ -91,4 +99,6 @@ export class DataGridComponent implements OnInit {
     this.editMode = false;
     this.currentPost = { id: 0, title: '', body: '' }; // Reset
   }
+
+ 
 }
