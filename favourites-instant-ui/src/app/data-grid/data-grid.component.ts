@@ -5,11 +5,20 @@ import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';  // Add this import
+import { MatInputModule } from '@angular/material/input';  // Add this import
 
 @Component({
   selector: 'app-data-grid',
   standalone: true,
-  imports: [CommonModule, MatTableModule, FormsModule, MatIconModule],
+  imports: [
+    CommonModule, 
+    MatTableModule, 
+    FormsModule, 
+    MatIconModule, 
+    MatFormFieldModule,  // Include MatFormFieldModule
+    MatInputModule,  // Include MatInputModule
+  ],
   templateUrl: './data-grid.component.html',
   styleUrls: ['./data-grid.component.css']
 })
@@ -57,15 +66,15 @@ export class DataGridComponent implements OnInit {
     console.log('Editing post:', post);
     this.editMode = true;
     this.currentPost = { ...post }; // Create a copy of the post to edit
-}
+  }
 
   savePost(): void {
-    if (this.currentPost) {
-      const index = this.posts.findIndex((p) => p.id === this.currentPost!.id);
+    if (this.currentPost && this.currentPost.id) {
+      const index = this.posts.findIndex((p) => p.id === this.currentPost.id);
       if (index !== -1) {
-        this.posts[index] = this.currentPost;
-        this.filteredPosts = this.posts;
-        this.cancelEdit();
+        this.posts[index] = { ...this.currentPost }; // Update with new data
+        this.filteredPosts = [...this.posts]; // Refresh the table
+        this.cancelEdit(); // Close the edit form
       }
     }
   }
@@ -73,13 +82,13 @@ export class DataGridComponent implements OnInit {
   deletePost(post: Post): void {
     const index = this.posts.indexOf(post);
     if (index !== -1) {
-      this.posts.splice(index, 1);
-      this.filteredPosts = this.posts;
+      this.posts.splice(index, 1); // Remove post
+      this.filteredPosts = [...this.posts]; // Refresh the table
     }
   }
 
   cancelEdit(): void {
     this.editMode = false;
-    this.currentPost = { id: 0, title: '', body: '' }; // Reset to an empty Post object
+    this.currentPost = { id: 0, title: '', body: '' }; // Reset
   }
 }

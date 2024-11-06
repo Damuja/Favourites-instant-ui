@@ -1,15 +1,12 @@
 <div class="container">
-  <h1>Post Data Table</h1>
+  <h1 class="page-title">Post Data Table</h1>
 
   <!-- Search Box -->
   <div class="search-box">
-    <input
-      type="text"
-      placeholder="Search by title"
-      [(ngModel)]="searchTerm"
-      (input)="onSearch()"
-      class="search-input"
-    />
+    <mat-form-field appearance="fill">
+      <mat-label>Search by title</mat-label>
+      <input matInput type="text" placeholder="Search..." [(ngModel)]="searchTerm" (input)="onSearch()" class="search-input"/>
+    </mat-form-field>
   </div>
 
   <!-- Posts Table -->
@@ -25,11 +22,10 @@
     <ng-container matColumnDef="title">
       <th mat-header-cell *matHeaderCellDef> Title </th>
       <td mat-cell *matCellDef="let post">
-        <span (click)="toggleExpand(post)" style="cursor: pointer;">{{ post.title }}</span>
+        <span (click)="toggleExpand(post)" class="clickable-title">{{ post.title }}</span>
         <div *ngIf="isExpanded(post)" class="expanded-content">
           <p><strong>ID:</strong> {{ post.id }}</p>
           <p><strong>Body:</strong> {{ post.body }}</p>
-          
         </div>
       </td>
     </ng-container>
@@ -38,12 +34,10 @@
     <ng-container matColumnDef="expand">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let post">
-          <button (click)="editPost(post)">Edit</button>
-          <button (click)="deletePost(post)">Delete</button>
+          <button mat-raised-button color="primary" (click)="editPost(post)">Edit</button>
+          <button mat-raised-button color="warn" (click)="deletePost(post)">Delete</button>
       </td>
     </ng-container>
-
-    
 
     <!-- Header Row -->
     <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand"></tr>
@@ -51,4 +45,25 @@
     <!-- Data Row -->
     <tr mat-row *matRowDef="let post; columns: columnsToDisplayWithExpand;" (click)="toggleExpand(post)"></tr>
   </table>
+
+  <!-- Edit Form (Modal/Popup) -->
+  <div *ngIf="editMode" class="edit-modal">
+    <div class="edit-form-card">
+      <h2>Edit Post</h2>
+      <mat-form-field appearance="fill">
+        <mat-label>Title</mat-label>
+        <input matInput [(ngModel)]="currentPost.title" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Body</mat-label>
+        <textarea matInput [(ngModel)]="currentPost.body"></textarea>
+      </mat-form-field>
+
+      <div class="button-group">
+        <button mat-raised-button color="primary" (click)="savePost()">Save</button>
+        <button mat-raised-button color="warn" (click)="cancelEdit()">Cancel</button>
+      </div>
+    </div>
+  </div>
 </div>
