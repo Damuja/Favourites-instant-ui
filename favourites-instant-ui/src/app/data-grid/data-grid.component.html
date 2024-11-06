@@ -1,5 +1,7 @@
 <div class="container">
-  <h1 fontSize="300">Dummy Fav & Instant Tickets</h1>
+  <h1>Post Data Table</h1>
+
+  <!-- Search Box -->
   <div class="search-box">
     <input
       type="text"
@@ -9,52 +11,44 @@
       class="search-input"
     />
   </div>
-  
-  <table mat-table [dataSource]="filteredPosts" class="styled-table mat-elevation-z8">
+
+  <!-- Posts Table -->
+  <table mat-table [dataSource]="filteredPosts" multiTemplateDataRows class="mat-elevation-z8">
+    
+    <!-- ID Column -->
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef> ID </th>
       <td mat-cell *matCellDef="let post"> {{ post.id }} </td>
     </ng-container>
-  
+
+    <!-- Title Column -->
     <ng-container matColumnDef="title">
       <th mat-header-cell *matHeaderCellDef> Title </th>
       <td mat-cell *matCellDef="let post">
-        <div *ngIf="editMode && currentPost?.id === post.id">
-          <input [(ngModel)]="currentPost!.title" placeholder="Edit title" />
-        </div>
-        <div *ngIf="!(editMode && currentPost?.id === post.id)">
-          {{ post.title }}
+        <span (click)="toggleExpand(post)" style="cursor: pointer;">{{ post.title }}</span>
+        <div *ngIf="isExpanded(post)" class="expanded-content">
+          <p><strong>ID:</strong> {{ post.id }}</p>
+          <p><strong>Body:</strong> {{ post.body }}</p>
+          
         </div>
       </td>
     </ng-container>
-  
-    <ng-container matColumnDef="body">
-      <th mat-header-cell *matHeaderCellDef> Body </th>
+
+    <!-- Expand Button Column -->
+    <ng-container matColumnDef="expand">
+      <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let post">
-        <div *ngIf="editMode && currentPost?.id === post.id">
-          <textarea [(ngModel)]="currentPost!.body" placeholder="Edit body"></textarea>
-        </div>
-        <div *ngIf="!(editMode && currentPost?.id === post.id)">
-          {{ post.body }}
-        </div>
+          <button (click)="editPost(post)">Edit</button>
+          <button (click)="deletePost(post)">Delete</button>
       </td>
     </ng-container>
-  
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef> Actions </th>
-      <td mat-cell *matCellDef="let post">
-        <div *ngIf="editMode && currentPost?.id === post.id">
-          <button (click)="savePost()" class="action-button">Save</button>
-          <button (click)="cancelEdit()" class="action-button cancel">Cancel</button>
-        </div>
-        <div *ngIf="!(editMode && currentPost?.id === post.id)">
-          <button (click)="editPost(post)" class="action-button">Edit</button>
-          <button (click)="deletePost(post)" class="action-button delete">Delete</button>
-        </div>
-      </td>
-    </ng-container>
-  
-    <tr mat-header-row *matHeaderRowDef="['id', 'title', 'body', 'actions']"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['id', 'title', 'body', 'actions']"></tr>
+
+    
+
+    <!-- Header Row -->
+    <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand"></tr>
+
+    <!-- Data Row -->
+    <tr mat-row *matRowDef="let post; columns: columnsToDisplayWithExpand;" (click)="toggleExpand(post)"></tr>
   </table>
 </div>

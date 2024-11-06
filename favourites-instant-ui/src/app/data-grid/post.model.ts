@@ -1,8 +1,6 @@
-// src/app/data-grid/post.model.ts
 export interface Post {
-    userId: number;
-    id: number;
-    title: string;
-    body: string;
-  }
-  
+  id: number;
+  title: string;
+  body: string;
+  details?: string; // Optional property for additional details
+}
