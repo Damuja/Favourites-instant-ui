@@ -166,6 +166,23 @@ mat-input-element {
   margin-bottom: 16px;
 }
 
+.instant-fare-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.instant-fare-form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 
 @keyframes fadeIn {
   from {

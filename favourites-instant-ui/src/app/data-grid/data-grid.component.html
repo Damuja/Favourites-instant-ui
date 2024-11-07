@@ -1,6 +1,11 @@
 <div class="container">
   <h1>Favourite & Instant Fares Portal</h1>
 
+  <!-- Button to open the Instant Fare Modal -->
+  <div class="top-buttons">
+    <button (click)="openInstantFareModal()">Add Instant Fare</button>
+  </div>
+
   <div class="search-box">
     <input
       type="text"
@@ -11,13 +16,14 @@
     />
   </div>
 
-  <!--Table -->
   <table mat-table [dataSource]="filteredPosts" multiTemplateDataRows class="mat-elevation-z8">
-
+    <!-- ID Column -->
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef> ID </th>
       <td mat-cell *matCellDef="let post"> {{ post.id }} </td>
     </ng-container>
+
+    <!-- Title Column -->
     <ng-container matColumnDef="title">
       <th mat-header-cell *matHeaderCellDef> Title </th>
       <td mat-cell *matCellDef="let post">
@@ -32,6 +38,8 @@
         </div>
       </td>
     </ng-container>
+
+    <!-- Action Column -->
     <ng-container matColumnDef="expand">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let post">
@@ -43,6 +51,8 @@
     <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand"></tr>
     <tr mat-row *matRowDef="let post; columns: columnsToDisplayWithExpand;" (click)="toggleExpand(post, $event)"></tr>
   </table>
+
+  <!-- Edit Modal -->
   <div *ngIf="editMode" class="edit-modal" (click)="stopRowExpand($event)">
     <div class="edit-form-card" (click)="stopRowExpand($event)">
       <h2>Edit Post</h2>
@@ -62,33 +72,53 @@
         <mat-label>Search Favorites</mat-label>
         <input matInput [(ngModel)]="favoriteSearchTerm" (input)="onFavoriteSearch()" />
       </mat-form-field>
-      <div *ngFor="let ticket of favoriteTickets">
-        <p>{{ ticket.title }}</p>
-        <button (click)="addTicketToCurrentPost(ticket, 'favorite')">Add to Favorites</button>
-      </div>
 
-      <h3>Add Instant Fares</h3>
+      <div *ngIf="alreadyAddedMessage.favorite">{{ alreadyAddedMessage.favorite }}</div>
+
+      <ul>
+        <li *ngFor="let ticket of favoriteTickets">
+          <button (click)="addTicketToCurrentPost(ticket, 'favorite')">Add {{ ticket.title }}</button>
+        </li>
+      </ul>
+
+      <h4>Favorites in Post:</h4>
+      <ul>
+        <li *ngFor="let favorite of currentPost.favorites">
+          {{ favorite.title }}
+          <button (click)="removeTicketFromCurrentPost(favorite.title, 'favorite')">Remove</button>
+        </li>
+      </ul>
+
+      <button (click)="savePost()">Save</button>
+      <button (click)="cancelEdit()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Instant Fare Modal -->
+  <div *ngIf="instantFareModalOpen" class="instant-fare-modal">
+    <div class="instant-fare-form-card">
+      <h3>Add Instant Fare</h3>
+
       <mat-form-field appearance="fill">
         <mat-label>Search Instant Fares</mat-label>
         <input matInput [(ngModel)]="instantFareSearchTerm" (input)="onInstantFareSearch()" />
       </mat-form-field>
-      <div *ngFor="let ticket of instantFareTickets">
-        <p>{{ ticket.title }}</p>
-        <button (click)="addTicketToCurrentPost(ticket, 'instantFare')">Add to Instant Fares</button>
-      </div>
 
-      <h3>Current Favorites</h3>
-      <div *ngFor="let ticket of currentPost.favorites">
-        <p>{{ ticket.title }} <button (click)="removeTicketFromCurrentPost(ticket.title, 'favorite')">Remove</button></p>
-      </div>
+      <ul>
+        <li *ngFor="let ticket of instantFareTickets">
+          <button (click)="addInstantFareToAllPosts(ticket)">Add {{ ticket.title }} to All Posts</button>
+        </li>
+      </ul>
 
-      <h3>Current Instant Fares</h3>
-      <div *ngFor="let ticket of currentPost.instantFares">
-        <h2>{{ ticket.title }} <button (click)="removeTicketFromCurrentPost(ticket.title, 'instantFare')">Remove</button></h2>
-      </div>
+      <h4>Selected Instant Fares:</h4>
+      <ul>
+        <li *ngFor="let instantFare of currentInstantFares">
+          {{ instantFare.title }}
+          <button (click)="removeInstantFare(instantFare.title)">Remove</button>
+        </li>
+      </ul>
 
-      <button mat-raised-button color="primary" (click)="savePost()">Save</button>
-      <button mat-raised-button color="warn" (click)="cancelEdit()">Cancel</button>
+      <button (click)="closeInstantFareModal()">Close</button>
     </div>
   </div>
 </div>

@@ -12,12 +12,12 @@ import { MatInputModule } from '@angular/material/input';
   selector: 'app-data-grid',
   standalone: true,
   imports: [
-    CommonModule, 
-    MatTableModule, 
-    FormsModule, 
-    MatIconModule, 
-    MatFormFieldModule, 
-    MatInputModule, 
+    CommonModule,
+    MatTableModule,
+    FormsModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   templateUrl: './data-grid.component.html',
   styleUrls: ['./data-grid.component.css']
@@ -30,7 +30,7 @@ export class DataGridComponent implements OnInit {
   currentPost: Post = { id: 0, title: '', body: '', favorites: [], instantFares: [] };
   expandedPostIds: Set<number> = new Set();
   columnsToDisplayWithExpand: string[] = ['id', 'title', 'expand'];
-
+  currentInstantFares: any[] = [];
   favoriteSearchTerm: string = '';
   instantFareSearchTerm: string = '';
   favoriteTickets: Post[] = [];
@@ -38,9 +38,13 @@ export class DataGridComponent implements OnInit {
 
   alreadyAddedMessage: { favorite: string | null, instantFare: string | null } = { favorite: null, instantFare: null };
 
+  // Modal state for Instant Fare
+  instantFareModalOpen: boolean = false;
+
   constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
+    // Fetch posts from the service
     this.dataService.getPosts().subscribe((data) => {
       this.posts = data;
       this.filteredPosts = data;
@@ -124,6 +128,15 @@ export class DataGridComponent implements OnInit {
     }
   }
 
+  // Method for removing an instant fare
+  removeInstantFare(ticketTitle: string): void {
+    if (this.currentPost.instantFares) {
+      this.currentPost.instantFares = this.currentPost.instantFares.filter(
+        (fare: { title: string }) => fare.title !== ticketTitle
+      );
+    }
+  }
+
   toggleExpand(post: Post, event: MouseEvent): void {
     if (this.editMode) {
       event.stopPropagation();
@@ -137,20 +150,14 @@ export class DataGridComponent implements OnInit {
     }
   }
 
-  editPost(post: Post): void {
-    this.editMode = true;
-    this.currentPost = { ...post }; // Copy the current post for editing
-    this.resetModal();  // Reset modal when editing
-  }
-
   savePost(): void {
     if (this.currentPost && this.currentPost.id) {
       const index = this.posts.findIndex((p) => p.id === this.currentPost.id);
       if (index !== -1) {
-        this.posts[index] = { ...this.currentPost }; // Update the post with new data
-        this.filteredPosts = [...this.posts]; // Update filtered posts
-        this.resetModal();  // Clear search terms and results
-        this.cancelEdit(); // Close the edit mode
+        this.posts[index] = { ...this.currentPost };
+        this.filteredPosts = [...this.posts];
+        this.resetModal();
+        this.cancelEdit();
       }
     }
   }
@@ -163,28 +170,51 @@ export class DataGridComponent implements OnInit {
     }
   }
 
+  editPost(post: Post): void {
+    this.editMode = true;
+    this.currentPost = { ...post };
+    this.currentInstantFares = this.currentPost.instantFares || []; // Initialize currentInstantFares
+    this.resetModal();
+  }
+
   cancelEdit(): void {
     this.editMode = false;
     this.currentPost = { id: 0, title: '', body: '', favorites: [], instantFares: [] };
-    this.resetModal();  // Reset modal state
+    this.resetModal();
   }
 
   resetModal(): void {
-    // Reset search terms
     this.favoriteSearchTerm = '';
     this.instantFareSearchTerm = '';
-
-    // Clear search results
     this.favoriteTickets = [];
     this.instantFareTickets = [];
-
-    // Clear added ticket messages
     this.alreadyAddedMessage.favorite = null;
     this.alreadyAddedMessage.instantFare = null;
+  }
 
-    // Reset current post's favorite and instant fare arrays
-    this.currentPost.favorites = [];
-    this.currentPost.instantFares = [];
+  // Instant Fare Modal Management
+  closeInstantFareModal(): void {
+    this.instantFareModalOpen = false;
+    this.instantFareSearchTerm = '';
+    this.instantFareTickets = [];
+  }
+
+  openInstantFareModal(): void {
+    this.instantFareModalOpen = true;
+    console.log('Instant Fare Modal opened');  // Debugging line
+  }
+
+  addInstantFareToAllPosts(ticket: Post): void {
+    for (const post of this.posts) {
+      if (!post.instantFares) {
+        post.instantFares = [];
+      }
+      if (!post.instantFares.some((fare: { title: string; }) => fare.title === ticket.title)) {
+        post.instantFares.push(ticket);
+      }
+    }
+    this.filteredPosts = [...this.posts];
+    this.closeInstantFareModal();
   }
 
   getFavoritesTitles(post: Post): string {
