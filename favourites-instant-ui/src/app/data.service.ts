@@ -17,7 +17,7 @@ export class DataService {
     return this.http.get<Post[]>(this.apiUrl);
   }
 
-  // Search for posts (or tickets) by title or other criteria
+  // Search for posts by title
   searchTickets(searchTerm: string): Observable<Post[]> {
     return this.http.get<Post[]>(this.apiUrl).pipe(
       map(posts =>
@@ -30,7 +30,7 @@ export class DataService {
   searchInstantFares(searchTerm: string): Observable<Post[]> {
     return this.http.get<Post[]>(this.apiUrl).pipe(
       map(posts => 
-        posts.filter(post => post.title.toLowerCase().includes(searchTerm.toLowerCase())) // Assuming 'category' field identifies instant fares
+        posts.filter(post => post.title.toLowerCase().includes(searchTerm.toLowerCase())) 
       )
     );
   }
@@ -38,7 +38,7 @@ export class DataService {
   searchFavorites(searchTerm: string): Observable<Post[]> {
     return this.http.get<Post[]>(this.apiUrl).pipe(
       map(posts => 
-        posts.filter(post => post.title.toLowerCase().includes(searchTerm.toLowerCase())) // Assuming 'category' field identifies instant fares
+        posts.filter(post => post.title.toLowerCase().includes(searchTerm.toLowerCase())) 
       )
     );
   }

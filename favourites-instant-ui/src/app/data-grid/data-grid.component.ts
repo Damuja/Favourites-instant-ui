@@ -36,6 +36,8 @@ export class DataGridComponent implements OnInit {
   favoriteTickets: Post[] = [];
   instantFareTickets: Post[] = [];
 
+  alreadyAddedMessage: { favorite: string | null, instantFare: string | null } = { favorite: null, instantFare: null };
+
   constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
@@ -57,7 +59,7 @@ export class DataGridComponent implements OnInit {
 
   onFavoriteSearch(): void {
     if (this.favoriteSearchTerm.trim() === '') {
-      this.favoriteTickets = this.posts.flatMap(post => post.favorites || []);
+      this.favoriteTickets = [];
     } else {
       this.dataService.searchFavorites(this.favoriteSearchTerm).subscribe((data) => {
         this.favoriteTickets = data;
@@ -67,7 +69,7 @@ export class DataGridComponent implements OnInit {
 
   onInstantFareSearch(): void {
     if (this.instantFareSearchTerm.trim() === '') {
-      this.instantFareTickets = this.posts.flatMap(post => post.instantFares || []);
+      this.instantFareTickets = [];
     } else {
       this.dataService.searchInstantFares(this.instantFareSearchTerm).subscribe((data) => {
         this.instantFareTickets = data;
@@ -91,14 +93,26 @@ export class DataGridComponent implements OnInit {
       }
       if (!this.currentPost.favorites.some((fav: { title: string; }) => fav.title === ticket.title)) {
         this.currentPost.favorites.push(ticket);
+        this.alreadyAddedMessage.favorite = null;
+      } else {
+        this.alreadyAddedMessage.favorite = 'This favorite is already added.';
       }
+
+      this.favoriteSearchTerm = ''; // Clear the search term
+      this.favoriteTickets = [];    // Reset search results
     } else if (type === 'instantFare') {
       if (!this.currentPost.instantFares) {
         this.currentPost.instantFares = [];
       }
       if (!this.currentPost.instantFares.some((fare: { title: string; }) => fare.title === ticket.title)) {
         this.currentPost.instantFares.push(ticket);
+        this.alreadyAddedMessage.instantFare = null;
+      } else {
+        this.alreadyAddedMessage.instantFare = 'This instant fare is already added.';
       }
+
+      this.instantFareSearchTerm = ''; // Clear the search term
+      this.instantFareTickets = [];    // Reset search results
     }
   }
 
@@ -126,6 +140,7 @@ export class DataGridComponent implements OnInit {
   editPost(post: Post): void {
     this.editMode = true;
     this.currentPost = { ...post }; // Copy the current post for editing
+    this.resetModal();  // Reset modal when editing
   }
 
   savePost(): void {
@@ -134,6 +149,7 @@ export class DataGridComponent implements OnInit {
       if (index !== -1) {
         this.posts[index] = { ...this.currentPost }; // Update the post with new data
         this.filteredPosts = [...this.posts]; // Update filtered posts
+        this.resetModal();  // Clear search terms and results
         this.cancelEdit(); // Close the edit mode
       }
     }
@@ -150,6 +166,25 @@ export class DataGridComponent implements OnInit {
   cancelEdit(): void {
     this.editMode = false;
     this.currentPost = { id: 0, title: '', body: '', favorites: [], instantFares: [] };
+    this.resetModal();  // Reset modal state
+  }
+
+  resetModal(): void {
+    // Reset search terms
+    this.favoriteSearchTerm = '';
+    this.instantFareSearchTerm = '';
+
+    // Clear search results
+    this.favoriteTickets = [];
+    this.instantFareTickets = [];
+
+    // Clear added ticket messages
+    this.alreadyAddedMessage.favorite = null;
+    this.alreadyAddedMessage.instantFare = null;
+
+    // Reset current post's favorite and instant fare arrays
+    this.currentPost.favorites = [];
+    this.currentPost.instantFares = [];
   }
 
   getFavoritesTitles(post: Post): string {

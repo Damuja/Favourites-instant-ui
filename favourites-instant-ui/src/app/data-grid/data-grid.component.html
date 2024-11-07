@@ -1,7 +1,6 @@
 <div class="container">
   <h1>Favourite & Instant Fares Portal</h1>
 
-  <!-- Search Box -->
   <div class="search-box">
     <input
       type="text"
@@ -12,15 +11,13 @@
     />
   </div>
 
-  <!-- Posts Table -->
+  <!--Table -->
   <table mat-table [dataSource]="filteredPosts" multiTemplateDataRows class="mat-elevation-z8">
-    <!-- ID Column -->
+
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef> ID </th>
       <td mat-cell *matCellDef="let post"> {{ post.id }} </td>
     </ng-container>
-
-    <!-- Title Column -->
     <ng-container matColumnDef="title">
       <th mat-header-cell *matHeaderCellDef> Title </th>
       <td mat-cell *matCellDef="let post">
@@ -35,8 +32,6 @@
         </div>
       </td>
     </ng-container>
-
-    <!-- Edit and Delete Button Column -->
     <ng-container matColumnDef="expand">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let post">
@@ -48,8 +43,6 @@
     <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand"></tr>
     <tr mat-row *matRowDef="let post; columns: columnsToDisplayWithExpand;" (click)="toggleExpand(post, $event)"></tr>
   </table>
-
-  <!-- Edit Modal -->
   <div *ngIf="editMode" class="edit-modal" (click)="stopRowExpand($event)">
     <div class="edit-form-card" (click)="stopRowExpand($event)">
       <h2>Edit Post</h2>
@@ -64,7 +57,6 @@
         <textarea matInput [(ngModel)]="currentPost.body"></textarea>
       </mat-form-field>
 
-      <!-- Search and Add Favorites -->
       <h3>Add Favorites</h3>
       <mat-form-field appearance="fill">
         <mat-label>Search Favorites</mat-label>
@@ -75,7 +67,6 @@
         <button (click)="addTicketToCurrentPost(ticket, 'favorite')">Add to Favorites</button>
       </div>
 
-      <!-- Search and Add Instant Fares -->
       <h3>Add Instant Fares</h3>
       <mat-form-field appearance="fill">
         <mat-label>Search Instant Fares</mat-label>
@@ -86,16 +77,14 @@
         <button (click)="addTicketToCurrentPost(ticket, 'instantFare')">Add to Instant Fares</button>
       </div>
 
-          <!-- Display Current Favorites -->
       <h3>Current Favorites</h3>
       <div *ngFor="let ticket of currentPost.favorites">
         <p>{{ ticket.title }} <button (click)="removeTicketFromCurrentPost(ticket.title, 'favorite')">Remove</button></p>
       </div>
 
-      <!-- Display Current Instant Fares -->
       <h3>Current Instant Fares</h3>
       <div *ngFor="let ticket of currentPost.instantFares">
-        <p>{{ ticket.title }} <button (click)="removeTicketFromCurrentPost(ticket.title, 'instantFare')">Remove</button></p>
+        <h2>{{ ticket.title }} <button (click)="removeTicketFromCurrentPost(ticket.title, 'instantFare')">Remove</button></h2>
       </div>
 
       <button mat-raised-button color="primary" (click)="savePost()">Save</button>
