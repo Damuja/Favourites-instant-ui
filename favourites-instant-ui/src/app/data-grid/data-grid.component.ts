@@ -5,8 +5,8 @@ import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';  // Add this import
-import { MatInputModule } from '@angular/material/input';  // Add this import
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-data-grid',
@@ -16,8 +16,8 @@ import { MatInputModule } from '@angular/material/input';  // Add this import
     MatTableModule, 
     FormsModule, 
     MatIconModule, 
-    MatFormFieldModule,  // Include MatFormFieldModule
-    MatInputModule,  // Include MatInputModule
+    MatFormFieldModule, 
+    MatInputModule, 
   ],
   templateUrl: './data-grid.component.html',
   styleUrls: ['./data-grid.component.css']
@@ -27,9 +27,14 @@ export class DataGridComponent implements OnInit {
   filteredPosts: Post[] = [];
   searchTerm: string = '';
   editMode: boolean = false;
-  currentPost: Post = { id: 0, title: '', body: '' };
+  currentPost: Post = { id: 0, title: '', body: '', favorites: [], instantFares: [] };
   expandedPostIds: Set<number> = new Set();
-  columnsToDisplayWithExpand: string[] = ['id', 'title', 'expand']; // Ensure this is defined
+  columnsToDisplayWithExpand: string[] = ['id', 'title', 'expand'];
+
+  favoriteSearchTerm: string = '';
+  instantFareSearchTerm: string = '';
+  favoriteTickets: Post[] = [];
+  instantFareTickets: Post[] = [];
 
   constructor(private dataService: DataService) {}
 
@@ -50,39 +55,86 @@ export class DataGridComponent implements OnInit {
     }
   }
 
+  onFavoriteSearch(): void {
+    if (this.favoriteSearchTerm.trim() === '') {
+      this.favoriteTickets = this.posts.flatMap(post => post.favorites || []);
+    } else {
+      this.dataService.searchFavorites(this.favoriteSearchTerm).subscribe((data) => {
+        this.favoriteTickets = data;
+      });
+    }
+  }
 
+  onInstantFareSearch(): void {
+    if (this.instantFareSearchTerm.trim() === '') {
+      this.instantFareTickets = this.posts.flatMap(post => post.instantFares || []);
+    } else {
+      this.dataService.searchInstantFares(this.instantFareSearchTerm).subscribe((data) => {
+        this.instantFareTickets = data;
+      });
+    }
+  }
 
-   // Modified toggleExpand to ignore clicks when modal is open
-   toggleExpand(post: Post, event: MouseEvent): void {
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.favoriteSearchTerm = '';
+    this.instantFareSearchTerm = '';
+    this.filteredPosts = this.posts;
+    this.favoriteTickets = [];
+    this.instantFareTickets = [];
+  }
+
+  addTicketToCurrentPost(ticket: Post, type: 'favorite' | 'instantFare'): void {
+    if (type === 'favorite') {
+      if (!this.currentPost.favorites) {
+        this.currentPost.favorites = [];
+      }
+      if (!this.currentPost.favorites.some((fav: { title: string; }) => fav.title === ticket.title)) {
+        this.currentPost.favorites.push(ticket);
+      }
+    } else if (type === 'instantFare') {
+      if (!this.currentPost.instantFares) {
+        this.currentPost.instantFares = [];
+      }
+      if (!this.currentPost.instantFares.some((fare: { title: string; }) => fare.title === ticket.title)) {
+        this.currentPost.instantFares.push(ticket);
+      }
+    }
+  }
+
+  removeTicketFromCurrentPost(ticketTitle: string, type: 'favorite' | 'instantFare'): void {
+    if (type === 'favorite') {
+      this.currentPost.favorites = this.currentPost.favorites?.filter((fav: { title: string; }) => fav.title !== ticketTitle);
+    } else if (type === 'instantFare') {
+      this.currentPost.instantFares = this.currentPost.instantFares?.filter((fare: { title: string; }) => fare.title !== ticketTitle);
+    }
+  }
+
+  toggleExpand(post: Post, event: MouseEvent): void {
     if (this.editMode) {
-      event.stopPropagation(); // Stop event propagation to prevent row expansion
+      event.stopPropagation();
       return;
     }
 
     if (this.expandedPostIds.has(post.id)) {
-      this.expandedPostIds.delete(post.id); // Collapse the post
+      this.expandedPostIds.delete(post.id);
     } else {
-      this.expandedPostIds.add(post.id); // Expand the post
+      this.expandedPostIds.add(post.id);
     }
   }
 
-  // Function to stop event propagation inside the modal
-  stopRowExpand(event: MouseEvent): void {
-    event.stopPropagation(); // Stop event propagation
-  }
   editPost(post: Post): void {
-    console.log('Editing post:', post);
     this.editMode = true;
-    this.currentPost = { ...post }; // Create a copy of the post to edit
+    this.currentPost = { ...post }; // Copy the current post for editing
   }
 
   savePost(): void {
     if (this.currentPost && this.currentPost.id) {
       const index = this.posts.findIndex((p) => p.id === this.currentPost.id);
       if (index !== -1) {
-        this.posts[index] = { ...this.currentPost }; // Update with new data
-        this.filteredPosts = [...this.posts]; // Refresh the table
-        this.cancelEdit(); // Close the edit form
+        this.posts[index] = { ...this.currentPost }; // Update the post with new data
+        this.filteredPosts = [...this.posts]; // Update filtered posts
+        this.cancelEdit(); // Close the edit mode
       }
     }
   }
@@ -90,15 +142,25 @@ export class DataGridComponent implements OnInit {
   deletePost(post: Post): void {
     const index = this.posts.indexOf(post);
     if (index !== -1) {
-      this.posts.splice(index, 1); // Remove post
-      this.filteredPosts = [...this.posts]; // Refresh the table
+      this.posts.splice(index, 1);
+      this.filteredPosts = [...this.posts];
     }
   }
 
   cancelEdit(): void {
     this.editMode = false;
-    this.currentPost = { id: 0, title: '', body: '' }; // Reset
+    this.currentPost = { id: 0, title: '', body: '', favorites: [], instantFares: [] };
   }
 
- 
+  getFavoritesTitles(post: Post): string {
+    return post.favorites?.map((fav: { title: any; }) => fav.title).join(', ') || '';
+  }
+
+  getInstantFareTitles(post: Post): string {
+    return post.instantFares?.map((fare: { title: any; }) => fare.title).join(', ') || '';
+  }
+
+  stopRowExpand(event: MouseEvent): void {
+    event.stopPropagation();
+  }
 }

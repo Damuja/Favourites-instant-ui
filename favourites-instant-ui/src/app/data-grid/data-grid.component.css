@@ -122,6 +122,8 @@ button.mat-raised-button {
   padding: 30px;
   border-radius: 8px;
   width: 450px;
+  max-height: 80%; /* Limit the height */
+  overflow-y: auto; /* Enable vertical scrolling */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   animation: fadeIn 0.3s ease-in-out;
 }

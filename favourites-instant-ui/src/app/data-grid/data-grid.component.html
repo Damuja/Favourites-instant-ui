@@ -1,7 +1,7 @@
 <div class="container">
-  <h1>Favourite & Instant Fares portal</h1>
+  <h1>Favourite & Instant Fares Portal</h1>
 
-  <!-- Search Box centered -->
+  <!-- Search Box -->
   <div class="search-box">
     <input
       type="text"
@@ -14,7 +14,6 @@
 
   <!-- Posts Table -->
   <table mat-table [dataSource]="filteredPosts" multiTemplateDataRows class="mat-elevation-z8">
-    
     <!-- ID Column -->
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef> ID </th>
@@ -31,6 +30,8 @@
         <div *ngIf="expandedPostIds.has(post.id)" class="expanded-content">
           <p><strong>ID:</strong> {{ post.id }}</p>
           <p><strong>Body:</strong> {{ post.body }}</p>
+          <p><strong>Favorites:</strong> {{ getFavoritesTitles(post) }}</p>
+          <p><strong>Instant Fares:</strong> {{ getInstantFareTitles(post) }}</p>
         </div>
       </td>
     </ng-container>
@@ -44,10 +45,7 @@
       </td>
     </ng-container>
 
-    <!-- Header Row -->
     <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand"></tr>
-
-    <!-- Data Row -->
     <tr mat-row *matRowDef="let post; columns: columnsToDisplayWithExpand;" (click)="toggleExpand(post, $event)"></tr>
   </table>
 
@@ -55,6 +53,7 @@
   <div *ngIf="editMode" class="edit-modal" (click)="stopRowExpand($event)">
     <div class="edit-form-card" (click)="stopRowExpand($event)">
       <h2>Edit Post</h2>
+
       <mat-form-field appearance="fill">
         <mat-label>Title</mat-label>
         <input matInput [(ngModel)]="currentPost.title" />
@@ -65,10 +64,42 @@
         <textarea matInput [(ngModel)]="currentPost.body"></textarea>
       </mat-form-field>
 
-      <div class="button-group">
-        <button mat-raised-button color="primary" (click)="savePost()">Save</button>
-        <button mat-raised-button color="warn" (click)="cancelEdit()">Cancel</button>
+      <!-- Search and Add Favorites -->
+      <h3>Add Favorites</h3>
+      <mat-form-field appearance="fill">
+        <mat-label>Search Favorites</mat-label>
+        <input matInput [(ngModel)]="favoriteSearchTerm" (input)="onFavoriteSearch()" />
+      </mat-form-field>
+      <div *ngFor="let ticket of favoriteTickets">
+        <p>{{ ticket.title }}</p>
+        <button (click)="addTicketToCurrentPost(ticket, 'favorite')">Add to Favorites</button>
       </div>
+
+      <!-- Search and Add Instant Fares -->
+      <h3>Add Instant Fares</h3>
+      <mat-form-field appearance="fill">
+        <mat-label>Search Instant Fares</mat-label>
+        <input matInput [(ngModel)]="instantFareSearchTerm" (input)="onInstantFareSearch()" />
+      </mat-form-field>
+      <div *ngFor="let ticket of instantFareTickets">
+        <p>{{ ticket.title }}</p>
+        <button (click)="addTicketToCurrentPost(ticket, 'instantFare')">Add to Instant Fares</button>
+      </div>
+
+          <!-- Display Current Favorites -->
+      <h3>Current Favorites</h3>
+      <div *ngFor="let ticket of currentPost.favorites">
+        <p>{{ ticket.title }} <button (click)="removeTicketFromCurrentPost(ticket.title, 'favorite')">Remove</button></p>
+      </div>
+
+      <!-- Display Current Instant Fares -->
+      <h3>Current Instant Fares</h3>
+      <div *ngFor="let ticket of currentPost.instantFares">
+        <p>{{ ticket.title }} <button (click)="removeTicketFromCurrentPost(ticket.title, 'instantFare')">Remove</button></p>
+      </div>
+
+      <button mat-raised-button color="primary" (click)="savePost()">Save</button>
+      <button mat-raised-button color="warn" (click)="cancelEdit()">Cancel</button>
     </div>
   </div>
 </div>
