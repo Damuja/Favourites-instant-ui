@@ -35,16 +35,17 @@ export class DataGridComponent implements OnInit {
   instantFareSearchTerm: string = '';
   favoriteTickets: Post[] = [];
   instantFareTickets: Post[] = [];
-
   alreadyAddedMessage: { favorite: string | null, instantFare: string | null } = { favorite: null, instantFare: null };
-
+  
   // Modal state for Instant Fare
   instantFareModalOpen: boolean = false;
+  
+  // Temporary selection of instant fares in the modal
+  selectedInstantFares: Post[] = [];
 
   constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
-    // Fetch posts from the service
     this.dataService.getPosts().subscribe((data) => {
       this.posts = data;
       this.filteredPosts = data;
@@ -101,8 +102,7 @@ export class DataGridComponent implements OnInit {
       } else {
         this.alreadyAddedMessage.favorite = 'This favorite is already added.';
       }
-
-      this.favoriteSearchTerm = ''; // Clear the search term
+      this.favoriteSearchTerm = ''; // Clear search term
       this.favoriteTickets = [];    // Reset search results
     } else if (type === 'instantFare') {
       if (!this.currentPost.instantFares) {
@@ -114,8 +114,7 @@ export class DataGridComponent implements OnInit {
       } else {
         this.alreadyAddedMessage.instantFare = 'This instant fare is already added.';
       }
-
-      this.instantFareSearchTerm = ''; // Clear the search term
+      this.instantFareSearchTerm = ''; // Clear search term
       this.instantFareTickets = [];    // Reset search results
     }
   }
@@ -128,13 +127,16 @@ export class DataGridComponent implements OnInit {
     }
   }
 
-  // Method for removing an instant fare
   removeInstantFare(ticketTitle: string): void {
-    if (this.currentPost.instantFares) {
-      this.currentPost.instantFares = this.currentPost.instantFares.filter(
-        (fare: { title: string }) => fare.title !== ticketTitle
-      );
-    }
+    // Remove the instant fare from all posts, not just the current post
+    this.posts.forEach(post => {
+      if (post.instantFares) {
+        post.instantFares = post.instantFares.filter((fare: { title: string }) => fare.title !== ticketTitle);
+      }
+    });
+  
+    // After modifying the posts, update the filtered posts to reflect the change
+    this.filteredPosts = [...this.posts]; // Ensure filteredPosts is updated with the latest state
   }
 
   toggleExpand(post: Post, event: MouseEvent): void {
@@ -142,7 +144,6 @@ export class DataGridComponent implements OnInit {
       event.stopPropagation();
       return;
     }
-
     if (this.expandedPostIds.has(post.id)) {
       this.expandedPostIds.delete(post.id);
     } else {
@@ -173,7 +174,7 @@ export class DataGridComponent implements OnInit {
   editPost(post: Post): void {
     this.editMode = true;
     this.currentPost = { ...post };
-    this.currentInstantFares = this.currentPost.instantFares || []; // Initialize currentInstantFares
+    this.currentInstantFares = this.currentPost.instantFares || [];
     this.resetModal();
   }
 
@@ -190,27 +191,54 @@ export class DataGridComponent implements OnInit {
     this.instantFareTickets = [];
     this.alreadyAddedMessage.favorite = null;
     this.alreadyAddedMessage.instantFare = null;
-  }
-
-  // Instant Fare Modal Management
-  closeInstantFareModal(): void {
-    this.instantFareModalOpen = false;
-    this.instantFareSearchTerm = '';
-    this.instantFareTickets = [];
+    this.selectedInstantFares = []; // Clear temporary selection
   }
 
   openInstantFareModal(): void {
     this.instantFareModalOpen = true;
-    console.log('Instant Fare Modal opened');  // Debugging line
   }
 
-  addInstantFareToAllPosts(ticket: Post): void {
+  closeInstantFareModal(): void {
+    this.instantFareModalOpen = false;
+    this.instantFareSearchTerm = ''; // Clear search term
+    this.instantFareTickets = [];    // Reset search results
+  }
+
+  addInstantFareToModal(ticket: Post): void {
+    if (!this.selectedInstantFares.some((fare) => fare.title === ticket.title)) {
+      this.selectedInstantFares.push(ticket);
+      this.alreadyAddedMessage.instantFare = null;
+    } else {
+      this.alreadyAddedMessage.instantFare = 'This instant fare is already added.';
+    }
+  }
+
+  removeInstantFareFromAllPosts(ticketTitle: string): void {
+    // Remove the instant fare from all posts
+    this.posts.forEach(post => {
+      if (post.instantFares) {
+        post.instantFares = post.instantFares.filter((fare: { title: string }) => fare.title !== ticketTitle);
+      }
+    });
+  
+    // Also remove the instant fare from the selectedInstantFares (modal list)
+    this.selectedInstantFares = this.selectedInstantFares.filter(
+      (fare: { title: string }) => fare.title !== ticketTitle
+    );
+  
+    // After modifying the posts, update the filtered posts to reflect the change
+    this.filteredPosts = [...this.posts]; // Ensure filteredPosts is updated with the latest state
+  }
+
+  addSelectedFaresToAllPosts(): void {
     for (const post of this.posts) {
       if (!post.instantFares) {
         post.instantFares = [];
       }
-      if (!post.instantFares.some((fare: { title: string; }) => fare.title === ticket.title)) {
-        post.instantFares.push(ticket);
+      for (const ticket of this.selectedInstantFares) {
+        if (!post.instantFares.some((fare: { title: string; }) => fare.title === ticket.title)) {
+          post.instantFares.push(ticket);
+        }
       }
     }
     this.filteredPosts = [...this.posts];
