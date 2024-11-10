@@ -1,0 +1,63 @@
+<!-- instant-fares-management.component.html -->
+<div class="container">
+    <h1>Manage Instant Fares</h1>
+  
+    <!-- Button to open Add Instant Fare Modal -->
+    <div class="top-buttons">
+      <button (click)="openAddInstantFareModal()">Add Instant Fare</button>
+    </div>
+  
+    <!-- Search Box for Instant Fares -->
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Search Instant Fares"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        class="search-input"
+      />
+    </div>
+  
+    <!-- Instant Fares Table -->
+    <table mat-table [dataSource]="filteredInstantFares" class="mat-elevation-z8">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let fare"> {{ fare.id }} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef> Title </th>
+        <td mat-cell *matCellDef="let fare"> {{ fare.title }} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef> Action </th>
+        <td mat-cell *matCellDef="let fare">
+          <button (click)="deleteInstantFare(fare)">Delete</button>
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+      <tr mat-row *matRowDef="let fare; columns: columnsToDisplay;"></tr>
+    </table>
+  
+    <!-- Add Instant Fare Modal -->
+    <div *ngIf="addInstantFareModalOpen" class="modal">
+      <div class="modal-content">
+        <h3>Add Instant Fare</h3>
+        <mat-form-field appearance="fill">
+          <mat-label>Title</mat-label>
+          <input matInput [(ngModel)]="newInstantFare.title" />
+        </mat-form-field>
+  
+        <mat-form-field appearance="fill">
+          <mat-label>Body</mat-label>
+          <textarea matInput [(ngModel)]="newInstantFare.body"></textarea>
+        </mat-form-field>
+  
+        <button (click)="saveInstantFare()">Save</button>
+        <button (click)="closeAddInstantFareModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+  

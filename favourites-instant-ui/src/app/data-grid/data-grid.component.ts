@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-data-grid',
@@ -22,11 +23,13 @@ import { MatInputModule } from '@angular/material/input';
   templateUrl: './data-grid.component.html',
   styleUrls: ['./data-grid.component.css']
 })
+
 export class DataGridComponent implements OnInit {
   posts: Post[] = [];
   filteredPosts: Post[] = [];
   searchTerm: string = '';
   editMode: boolean = false;
+  searchType: string = 'title'; // Default search type is "title"
   currentPost: Post = { id: 0, title: '', body: '', favorites: [], instantFares: [] };
   expandedPostIds: Set<number> = new Set();
   columnsToDisplayWithExpand: string[] = ['id', 'title', 'expand'];
@@ -37,13 +40,14 @@ export class DataGridComponent implements OnInit {
   instantFareTickets: Post[] = [];
   alreadyAddedMessage: { favorite: string | null, instantFare: string | null } = { favorite: null, instantFare: null };
   
+  
   // Modal state for Instant Fare
   instantFareModalOpen: boolean = false;
   
   // Temporary selection of instant fares in the modal
   selectedInstantFares: Post[] = [];
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService, private router: Router) {}
 
   ngOnInit(): void {
     this.dataService.getPosts().subscribe((data) => {
@@ -52,13 +56,26 @@ export class DataGridComponent implements OnInit {
     });
   }
 
+  goToInstantFares() {
+    this.router.navigate(['/instant-fares']);
+  }
+
   onSearch(): void {
-    if (this.searchTerm.trim() === '') {
+    const searchTerm = this.searchTerm.toLowerCase();
+
+    if (searchTerm.trim() === '') {
       this.filteredPosts = this.posts;
     } else {
-      this.filteredPosts = this.posts.filter((post) =>
-        post.title.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
+      this.filteredPosts = this.posts.filter((post) => {
+        if (this.searchType === 'id') {
+          return post.id.toString().includes(searchTerm);
+        } else if (this.searchType === 'body') {
+          return post.body?.toLowerCase().includes(searchTerm);
+        } else {
+          // Default to search by title
+          return post.title.toLowerCase().includes(searchTerm);
+        }
+      });
     }
   }
 
