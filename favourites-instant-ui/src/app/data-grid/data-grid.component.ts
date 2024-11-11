@@ -7,6 +7,8 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatToolbarModule } from '@angular/material/toolbar'
+ 
 
 @Component({
   selector: 'app-data-grid',
@@ -18,6 +20,8 @@ import { MatInputModule } from '@angular/material/input';
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
+    MatIconModule,
+    MatToolbarModule
   ],
   templateUrl: './data-grid.component.html',
   styleUrls: ['./data-grid.component.css']

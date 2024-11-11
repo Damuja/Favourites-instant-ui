@@ -197,6 +197,10 @@ mat-form-field {
   animation: fadeIn 0.3s ease-in-out;
 }
 
+.spacer {
+  flex: 1 1 auto;
+}
+
 
 @keyframes fadeIn {
   from {
