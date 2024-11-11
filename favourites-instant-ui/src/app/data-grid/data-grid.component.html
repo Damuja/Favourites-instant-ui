@@ -1,25 +1,22 @@
 <mat-toolbar color="blue">
   <mat-toolbar-row>
     <span>
-
+      <img src="../../assets/STAR_logo.png" style="width:64px;height:64px;">
     </span>
     <a class="pageheading"><h1 class="pageheading">Favourite & Instant Fares Portal</h1></a>
     <span class="spacer"></span>
-    <a mat-button><mat-icon>search</mat-icon></a>
+      <button (click)="openInstantFareModal()">Add Instant Fare</button>
+      <span class="btnspace"></span>
+      <button (click)="openCreateInstantFareModal()">Create Instant Fare</button>
+      <span class="btnspace"></span>
+    <a mat-button class="navtext">Search<mat-icon>search</mat-icon></a>
     <span class="btnspace"></span>
-    <a mat-button><mat-icon>edit</mat-icon></a>
+    <a mat-button class="navtext">Create Instant Fare<mat-icon>edit</mat-icon></a>
     <span class="btnspace"></span>
-    <a mat-button><mat-icon>logout</mat-icon></a>
+    <a mat-button class="navtext">Logout<mat-icon>logout</mat-icon></a>
   </mat-toolbar-row>
 </mat-toolbar>
 <div class="container">
-  
-
-  <!-- Button to open the Instant Fare Modal -->
-  <div class="top-buttons">
-    <button (click)="openInstantFareModal()">Add Instant Fare</button>
-    <button (click)="openCreateInstantFareModal()">Create Instant Fare</button>
-  </div>
 
   <!-- Create Instant Fare Modal -->
   <div *ngIf="createInstantFareModalOpen" class="instant-fare-modal">
@@ -31,10 +28,7 @@
         <input matInput [(ngModel)]="newInstantFareTitle" />
       </mat-form-field>
 
-      <div class="button-group">
-        <button (click)="createInstantFare()">Save Instant Fare</button>
-        <button (click)="closeCreateInstantFareModal()">Cancel</button>
-      </div>
+      
     </div>
   </div>
 
