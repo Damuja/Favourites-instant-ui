@@ -6,10 +6,17 @@
     <button (click)="openInstantFareModal()">Add Instant Fare</button>
   </div>
 
+  <!-- Search box with dropdown for selecting search type -->
   <div class="search-box">
+    <select [(ngModel)]="searchType" (change)="onSearch()">
+      <option value="title">Title</option>
+      <option value="id">ID</option>
+      <option value="body">Body</option>
+    </select>
+
     <input
       type="text"
-      placeholder="Search by title"
+      placeholder="Search"
       [(ngModel)]="searchTerm"
       (input)="onSearch()"
       class="search-input"

@@ -27,6 +27,7 @@ export class DataGridComponent implements OnInit {
   filteredPosts: Post[] = [];
   searchTerm: string = '';
   editMode: boolean = false;
+  searchType: string = 'title'; // Default search type is "title"
   currentPost: Post = { id: 0, title: '', body: '', favorites: [], instantFares: [] };
   expandedPostIds: Set<number> = new Set();
   columnsToDisplayWithExpand: string[] = ['id', 'title', 'expand'];
@@ -53,12 +54,21 @@ export class DataGridComponent implements OnInit {
   }
 
   onSearch(): void {
-    if (this.searchTerm.trim() === '') {
+    const searchTerm = this.searchTerm.toLowerCase();
+
+    if (searchTerm.trim() === '') {
       this.filteredPosts = this.posts;
     } else {
-      this.filteredPosts = this.posts.filter((post) =>
-        post.title.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
+      this.filteredPosts = this.posts.filter((post) => {
+        if (this.searchType === 'id') {
+          return post.id.toString().includes(searchTerm);
+        } else if (this.searchType === 'body') {
+          return post.body?.toLowerCase().includes(searchTerm);
+        } else {
+          // Default to search by title
+          return post.title.toLowerCase().includes(searchTerm);
+        }
+      });
     }
   }
 
