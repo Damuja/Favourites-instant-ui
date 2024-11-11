@@ -4,6 +4,24 @@
   <!-- Button to open the Instant Fare Modal -->
   <div class="top-buttons">
     <button (click)="openInstantFareModal()">Add Instant Fare</button>
+    <button (click)="openCreateInstantFareModal()">Create Instant Fare</button>
+  </div>
+
+  <!-- Create Instant Fare Modal -->
+  <div *ngIf="createInstantFareModalOpen" class="instant-fare-modal">
+    <div class="instant-fare-form-card">
+      <h3>Create New Instant Fare</h3>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Instant Fare Title</mat-label>
+        <input matInput [(ngModel)]="newInstantFareTitle" />
+      </mat-form-field>
+
+      <div class="button-group">
+        <button (click)="createInstantFare()">Save Instant Fare</button>
+        <button (click)="closeCreateInstantFareModal()">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <!-- Search box with dropdown for selecting search type -->
@@ -24,13 +42,11 @@
   </div>
 
   <table mat-table [dataSource]="filteredPosts" multiTemplateDataRows class="mat-elevation-z8">
-    <!-- ID Column -->
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef> ID </th>
       <td mat-cell *matCellDef="let post"> {{ post.id }} </td>
     </ng-container>
 
-    <!-- Title Column -->
     <ng-container matColumnDef="title">
       <th mat-header-cell *matHeaderCellDef> Title </th>
       <td mat-cell *matCellDef="let post">
@@ -46,7 +62,6 @@
       </td>
     </ng-container>
 
-    <!-- Action Column -->
     <ng-container matColumnDef="expand">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let post">
@@ -102,32 +117,31 @@
   </div>
 
   <!-- Instant Fare Modal -->
-<div *ngIf="instantFareModalOpen" class="instant-fare-modal">
-  <div class="instant-fare-form-card">
-    <h3>Add Instant Fare</h3>
+  <div *ngIf="instantFareModalOpen" class="instant-fare-modal">
+    <div class="instant-fare-form-card">
+      <h3>Add Instant Fare</h3>
 
-    <mat-form-field appearance="fill">
-      <mat-label>Search Instant Fares</mat-label>
-      <input matInput [(ngModel)]="instantFareSearchTerm" (input)="onInstantFareSearch()" />
-    </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Search Instant Fares</mat-label>
+        <input matInput [(ngModel)]="instantFareSearchTerm" (input)="onInstantFareSearch()" />
+      </mat-form-field>
 
-    <ul>
-      <li *ngFor="let ticket of instantFareTickets">
-        <button (click)="addInstantFareToModal(ticket)">Add {{ ticket.title }}</button>
-      </li>
-    </ul>
+      <ul>
+        <li *ngFor="let ticket of instantFareTickets">
+          <button (click)="addInstantFareToModal(ticket)">Add {{ ticket.title }}</button>
+        </li>
+      </ul>
 
-    <!-- List of Selected Instant Fares -->
-    <h4>Selected Instant Fares:</h4>
-    <ul>
-      <li *ngFor="let instantFare of selectedInstantFares">
-        {{ instantFare.title }}
-        <button (click)="removeInstantFareFromAllPosts(instantFare.title)">Remove from All Posts</button>
-      </li>
-    </ul>
+      <h4>Selected Instant Fares:</h4>
+      <ul>
+        <li *ngFor="let instantFare of selectedInstantFares">
+          {{ instantFare.title }}
+          <button (click)="removeInstantFareFromAllPosts(instantFare.title)">Remove from All Posts</button>
+        </li>
+      </ul>
 
-    <button (click)="addSelectedFaresToAllPosts()">Add to All Posts</button>
-    <button (click)="closeInstantFareModal()">Close</button>
+      <button (click)="addSelectedFaresToAllPosts()">Add to All Posts</button>
+      <button (click)="closeInstantFareModal()">Close</button>
+    </div>
   </div>
-</div>
 </div>

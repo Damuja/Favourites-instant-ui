@@ -37,6 +37,11 @@ export class DataGridComponent implements OnInit {
   favoriteTickets: Post[] = [];
   instantFareTickets: Post[] = [];
   alreadyAddedMessage: { favorite: string | null, instantFare: string | null } = { favorite: null, instantFare: null };
+  createInstantFareModalOpen: boolean = false;
+  newInstantFareTitle: string = '';
+  newInstantFareDescription: string = '';
+  filteredInstantFares: Post[] = [];
+  
   
   // Modal state for Instant Fare
   instantFareModalOpen: boolean = false;
@@ -69,6 +74,18 @@ export class DataGridComponent implements OnInit {
           return post.title.toLowerCase().includes(searchTerm);
         }
       });
+    }
+  }
+  // This function filters the instant fares based on the search term
+  searchInstantFares(): void {
+    // Only filter if there’s a search term
+    if (this.searchTerm.trim()) {
+      this.filteredInstantFares = this.instantFareTickets.filter(fare =>
+        fare.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    } else {
+      // Clear filtered list when search term is empty
+      this.filteredInstantFares = [];
     }
   }
 
@@ -173,6 +190,53 @@ export class DataGridComponent implements OnInit {
     }
   }
 
+  openCreateInstantFareModal(): void {
+    this.createInstantFareModalOpen = true;
+  }
+  
+  closeCreateInstantFareModal(): void {
+    this.createInstantFareModalOpen = false;
+
+    this.newInstantFareDescription = '';
+  }
+
+// Function to add a new instant fare
+createInstantFare(): void {
+  if (this.newInstantFareTitle.trim()) {
+    const newFare: Post = {
+      id: Date.now(),
+      title: this.newInstantFareTitle,
+      body: '',
+      favorites: [],
+      instantFares: []
+    };
+
+    // Add the new fare to `instantFareTickets` instead of `selectedInstantFares`
+    this.instantFareTickets.push(newFare);
+
+    // Clear the input and close the modal
+    this.closeCreateInstantFareModal();
+  }
+}
+  
+  saveNewInstantFare(): void {
+    if (this.newInstantFareTitle.trim() && this.newInstantFareDescription.trim()) {
+      const newInstantFare = {
+        id: Math.max(...this.instantFareTickets.map(ticket => ticket.id)) + 1,
+        title: this.newInstantFareTitle,
+        body: this.newInstantFareDescription,
+      };
+      
+      // Add new instant fare to the tickets array for reuse
+      this.instantFareTickets.push(newInstantFare);
+  
+      this.closeCreateInstantFareModal();
+    } else {
+      alert('Please fill in all fields.');
+    }
+  }
+  
+
   deletePost(post: Post): void {
     const index = this.posts.indexOf(post);
     if (index !== -1) {
@@ -238,6 +302,13 @@ export class DataGridComponent implements OnInit {
   
     // After modifying the posts, update the filtered posts to reflect the change
     this.filteredPosts = [...this.posts]; // Ensure filteredPosts is updated with the latest state
+  }
+
+  selectInstantFare(fare: Post): void {
+    // Add fare to `selectedInstantFares` only if it’s not already there
+    if (!this.selectedInstantFares.some(selected => selected.id === fare.id)) {
+      this.selectedInstantFares.push(fare);
+    }
   }
 
   addSelectedFaresToAllPosts(): void {
