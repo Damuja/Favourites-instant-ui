@@ -7,6 +7,24 @@
   padding: 20px;
 }
 
+.icon-text {
+  display: inline-flex;        
+  align-items: center;        
+  gap: 4px;                    
+}
+
+.btnspace {
+  padding: 0 8px;           
+}
+
+.editpostbtnspace{
+  padding: 0 4px;
+}
+
+.editbutton{
+  padding-right: 10px;
+}
+
 h1 {
   text-align: center;
   color: #333;
@@ -83,6 +101,21 @@ tr:nth-child(odd) {
   background-color: #ffffff;
 }
 
+.navtext{
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.navtext:hover{
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
 button {
   background-color: #007bff;
   color: white;
@@ -157,7 +190,7 @@ mat-form-field {
   margin-bottom: 20px;
 }
 .mat-toolbar{
-  color: #d9e0e6;
+  color: #ffffff;
   display: inline-flex;
 }
 
@@ -215,7 +248,7 @@ mat-form-field {
 }
 
 .pageheading{
-  color: #d9e0e6;
+  color: #ffffff;
 }
 
 .navtext{
